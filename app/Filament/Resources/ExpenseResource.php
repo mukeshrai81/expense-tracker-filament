@@ -45,7 +45,7 @@ class ExpenseResource extends Resource
                 TextInput::make('amount')
                     ->numeric()
                     ->required(),
-                DatePicker::make('date')
+                DatePicker::make('date')->default(Carbon::now())->label('Expense Date')
                     ->required(),
                 Textarea::make('description'),
                 Select::make('category_id')
@@ -86,13 +86,17 @@ class ExpenseResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('title')->searchable()->sortable(),
-                TextColumn::make('amount')->money('NPR')->sortable()->toggleable(),
-                TextColumn::make('date')->date('D M d, Y D')->sortable()->toggleable(),
-                TextColumn::make('description')->limit(30)->toggleable(),
+                TextColumn::make('amount')->money('NPR')->sortable()->toggleable()->colors([
+                    'danger' => fn($state) => $state > 200,
+                    'success' => fn($state) => $state <= 200,
+                ]),
+                TextColumn::make('date')->date('D M d, Y D')->sortable()->toggleable()->label('Expense Date'),
                 TextColumn::make('category.name')->label('Category')->sortable()->toggleable(),
-                TextColumn::make('tags')->badge()->label('Tags')->separator(', ')->colors(['primary',])->toggleable(),
+                TextColumn::make('description')->limit(30)->toggleable(),
+                TextColumn::make('tags')->badge()->label('Tags')->separator(', ')->color("warning")->toggleable(),
                 TextColumn::make('created_at')->dateTime('M d, Y D h:ia')->label('Created')->sortable()->toggleable()
             ])
+            ->defaultSort('date', 'desc')
             ->filters([
                 SelectFilter::make('category')->multiple()->relationship('category', 'name'),
                 Filter::make('today')
@@ -100,9 +104,10 @@ class ExpenseResource extends Resource
                     ->query(fn(Builder $query) => $query->whereDate('date', today())),
                 Filter::make('this week')
                     ->label('This Week')
-                    ->query(fn(Builder $query) => $query
-                        ->whereDate('date', '>=', now()->startOfWeek(Carbon::SUNDAY))
-                        ->whereDate('date', '<=', now()->endOfWeek())
+                    ->query(
+                        fn(Builder $query) => $query
+                            ->whereDate('date', '>=', now()->startOfWeek(Carbon::SUNDAY))
+                            ->whereDate('date', '<=', now()->endOfWeek())
                     ),
 
                 Filter::make('this_month')
@@ -132,8 +137,21 @@ class ExpenseResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->successNotificationTitle('Expenses deleted successfully'),
+                ])->label('Bulk Actions')->icon('heroicon-o-ellipsis-horizontal'),
+
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\Action::make('Export CSV')
+                        // ->icon('heroicon-o-download')
+                        ->action(fn() => redirect()->route('filament.resources.expenses.export')),
+                    Tables\Actions\Action::make('Export PDF')
+                        // ->icon('heroicon-o-document-download')
+                        ->action(fn() => redirect()->route('filament.resources.expenses.export-pdf')),
+                    Tables\Actions\Action::make('Export Excel')
+                        // ->icon('heroicon-o-document-download')
+                        ->action(fn() => redirect()->route('filament.resources.expenses.export-excel')),
+                ])->label('Export Options')->icon('heroicon-o-arrow-down-tray'),
             ]);
     }
 

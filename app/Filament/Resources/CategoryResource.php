@@ -30,7 +30,9 @@ class CategoryResource extends Resource
                 TextInput::make('name')
                     ->required()
                     ->unique(ignoreRecord: true)
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->label('Category Name')
+                    ->placeholder('Enter category name'),
             ]);
     }
 
@@ -41,6 +43,7 @@ class CategoryResource extends Resource
                 TextColumn::make('name')->sortable()->searchable(),
                 TextColumn::make('created_at')->dateTime('d M Y h:ia')->label('Created')->sortable(),
             ])
+            ->defaultSort('name', 'ASC')
             ->filters([
                 //
             ])

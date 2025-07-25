@@ -8,6 +8,7 @@ use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages;
 use Filament\Panel;
+// use Filament\Support\Brand;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Widgets;
@@ -30,13 +31,12 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Green,
                 'secondary' => Color::Amber,
-                'success' => Color::Teal,
-                'danger' => Color::Red,
-                'warning' => Color::Yellow,
-                'info' => Color::hex('#3B82F6'),
-                'light' => Color::hex('#F9FAFB'),
-                'dark' => Color::hex('#111827'),
             ])
+
+            ->brandName('Expenny')
+            ->brandLogo(asset('images/logo/expenny.png'))
+            ->darkModeBrandLogo(asset('images/logo/expenny-white.png'))
+
             ->sidebarCollapsibleOnDesktop() // enables "collapsible"
             // ->sidebarFullyCollapsibleOnDesktop() // enables "fully collapsible"
 
