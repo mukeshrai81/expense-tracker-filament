@@ -2,6 +2,17 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Schemas\Schema;
+use Filament\Actions\ViewAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\Action;
+use App\Filament\Resources\ExpenseResource\Pages\ListExpenses;
+use App\Filament\Resources\ExpenseResource\Pages\CreateExpense;
+use App\Filament\Resources\ExpenseResource\Pages\EditExpense;
 use App\Filament\Resources\ExpenseResource\Pages;
 use App\Filament\Resources\ExpenseResource\RelationManagers;
 use App\Models\Expense;
@@ -14,7 +25,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\BadgeColumn;
@@ -30,15 +40,15 @@ class ExpenseResource extends Resource
     protected static ?string $model = Expense::class;
 
     // protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationIcon = 'heroicon-o-currency-dollar';
-    protected static ?string $navigationGroup = 'Finance';
+    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-currency-dollar';
+    protected static string | \UnitEnum | null $navigationGroup = 'Finance';
     protected static ?string $navigationLabel = 'Expenses';
 
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 TextInput::make('title')
                     ->required()
                     ->maxLength(255),
@@ -119,7 +129,7 @@ class ExpenseResource extends Resource
                     ),
 
                 Filter::make('date')
-                    ->form([
+                    ->schema([
                         DatePicker::make('from')->label('From date'),
                         DatePicker::make('until')->label('Until date'),
                     ])
@@ -130,25 +140,25 @@ class ExpenseResource extends Resource
                     }),
 
             ])
-            ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
                         ->successNotificationTitle('Expenses deleted successfully'),
                 ])->label('Bulk Actions')->icon('heroicon-o-ellipsis-horizontal'),
 
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\Action::make('Export CSV')
+                ActionGroup::make([
+                    Action::make('Export CSV')
                         // ->icon('heroicon-o-download')
                         ->action(fn() => redirect()->route('filament.resources.expenses.export')),
-                    Tables\Actions\Action::make('Export PDF')
+                    Action::make('Export PDF')
                         // ->icon('heroicon-o-document-download')
                         ->action(fn() => redirect()->route('filament.resources.expenses.export-pdf')),
-                    Tables\Actions\Action::make('Export Excel')
+                    Action::make('Export Excel')
                         // ->icon('heroicon-o-document-download')
                         ->action(fn() => redirect()->route('filament.resources.expenses.export-excel')),
                 ])->label('Export Options')->icon('heroicon-o-arrow-down-tray'),
@@ -165,9 +175,9 @@ class ExpenseResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListExpenses::route('/'),
-            'create' => Pages\CreateExpense::route('/create'),
-            'edit' => Pages\EditExpense::route('/{record}/edit'),
+            'index' => ListExpenses::route('/'),
+            'create' => CreateExpense::route('/create'),
+            'edit' => EditExpense::route('/{record}/edit'),
         ];
     }
 }
