@@ -48,6 +48,22 @@ class CategoryResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')->sortable()->searchable(),
+
+                // 👉 Custom column: Expense Count
+                TextColumn::make('expenses_count')
+                    ->label('Total Expenses')
+                    // ->counts('expenses') // auto-counts the relationship
+                    ->badge()
+                    ->colors([
+                        'warning' => fn($state) => $state == 0,
+                        'success' => fn($state) => ($state > 0 && $state <= 5),
+                        'info' => fn($state) => ($state > 5 && $state <= 10),
+                        'grey' => fn($state) => ($state > 10 && $state <= 20),
+                        'danger' => fn($state) => $state > 20                        
+                    ])
+                    ->sortable()
+                    ->toggleable(),
+
                 TextColumn::make('created_at')->dateTime('d M Y h:ia')->label('Created')->sortable(),
             ])
             ->defaultSort('name', 'ASC')
@@ -79,5 +95,11 @@ class CategoryResource extends Resource
             'create' => CreateCategory::route('/create'),
             'edit' => EditCategory::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withCount('expenses'); // Adds `expenses_count` field
     }
 }
