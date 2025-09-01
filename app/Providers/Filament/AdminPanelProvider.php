@@ -2,6 +2,9 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Widgets\ExpensesBarChart;
+use App\Filament\Widgets\ExpensesLineChart;
+use App\Filament\Widgets\ExpensesPieChart;
 use Filament\Pages\Dashboard;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
@@ -50,10 +53,13 @@ class AdminPanelProvider extends PanelProvider
             ->pages([
                 Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
+            // ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                AccountWidget::class,
-                FilamentInfoWidget::class,
+                // AccountWidget::class,
+                // FilamentInfoWidget::class,
+                ExpensesLineChart::class,
+                ExpensesPieChart::class,
+                ExpensesBarChart::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -70,4 +76,20 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ]);
     }
+
+    // protected function getHeaderWidgets(): array
+    // {
+    //     return [
+    //         ExpensesLineChart::class,
+    //         ExpensesBarChart::class,
+    //     ];
+    // }
+
+    // // TODO :: footer widget
+    // protected function getFooterWidgets(): array
+    // {
+    //     return [
+    //         FilamentInfoWidget::class,
+    //     ];
+    // }
 }

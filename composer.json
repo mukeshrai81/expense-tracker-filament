@@ -9,10 +9,12 @@
         "php": "^8.2",
         "filament/filament": "~4.0",
         "filament/support": "^4.0",
+        "flowframe/laravel-trend": "^0.4.0",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.16",
         "fakerphp/faker": "^1.23",
         "filament/upgrade": "^4.0",
         "laravel/pail": "^1.2.2",
