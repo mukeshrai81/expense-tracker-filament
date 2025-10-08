@@ -61,6 +61,30 @@ class AdminPanelProvider extends PanelProvider
                 ExpensesPieChart::class,
                 ExpensesBarChart::class,
             ])
+
+            // Add manifest in <head>
+            ->renderHook(
+                'panels::head.end',
+                fn(): string => <<<'HTML'
+                    <link rel="manifest" href="/manifest.json">
+                    <meta name="theme-color" content="#0f172a">
+                HTML,
+            )
+
+            // Add service worker registration before </body>
+            ->renderHook(
+                'panels::body.end',
+                fn(): string => <<<'HTML'
+                    <script>
+                        if ("serviceWorker" in navigator) {
+                            navigator.serviceWorker.register("/sw.js")
+                                .then(reg => console.log("Service worker registered", reg))
+                                .catch(err => console.error("SW registration failed:", err));
+                        }
+                    </script>
+                HTML,
+            )
+
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
