@@ -95,14 +95,20 @@ class ExpenseResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('title')->searchable()->sortable(),
+                TextColumn::make('title')->searchable()->sortable()
+                    ->copyable()
+                    ->copyMessage('Title copied.')
+                    ->copyMessageDuration(1500),
                 TextColumn::make('amount')->money('NPR')->sortable()->toggleable()->colors([
                     'danger' => fn($state) => $state > 200,
                     'success' => fn($state) => $state <= 200,
                 ]),
                 TextColumn::make('date')->date('D M d, Y D')->sortable()->toggleable()->label('Expense Date'),
                 TextColumn::make('category.name')->label('Category')->sortable()->toggleable(),
-                TextColumn::make('description')->limit(30)->toggleable(),
+                TextColumn::make('description')->limit(30)->toggleable()
+                    ->copyable()
+                    ->copyMessage('Description copied.')
+                    ->copyMessageDuration(1500),
                 TextColumn::make('tags')->badge()->label('Tags')->separator(', ')->color("warning")->toggleable(),
                 TextColumn::make('created_at')->dateTime('M d, Y D h:ia')->label('Created')->sortable()->toggleable()
             ])
