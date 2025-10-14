@@ -15,16 +15,15 @@ class CreateExpense extends CreateRecord
     //     return static::getResource()::getUrl('index');
     // }
 
-    protected function afterCreate(): void
+    protected function getCreatedNotification(): ?Notification
     {
-        Notification::make()
+        return Notification::make()
+            ->success()
             ->title('Expense created successfully!')
             ->body('Your expense has been added to the records.')
             ->icon('heroicon-o-check-circle')
             ->iconColor('success')
-            ->success()
-            ->duration(3000) // 3 seconds
-            ->send();
+            ->duration(3000); // 3 seconds
     }
 
     protected function getRedirectUrl(): string
