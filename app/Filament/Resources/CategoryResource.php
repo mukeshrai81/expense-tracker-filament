@@ -51,7 +51,7 @@ class CategoryResource extends Resource
 
                 // 👉 Custom column: Expense Count
                 TextColumn::make('expenses_count')
-                    ->label('Total Expenses')
+                    ->label('#Expense')
                     // ->counts('expenses') // auto-counts the relationship
                     ->badge()
                     ->colors([
@@ -59,11 +59,23 @@ class CategoryResource extends Resource
                         'success' => fn($state) => ($state > 0 && $state <= 5),
                         'info' => fn($state) => ($state > 5 && $state <= 10),
                         'grey' => fn($state) => ($state > 10 && $state <= 20),
-                        'danger' => fn($state) => $state > 20                        
+                        'danger' => fn($state) => $state > 20
                     ])
                     ->sortable()
                     ->toggleable(),
-
+                TextColumn::make('expenses_sum_amount')
+                    ->label('∑Expense')
+                    ->sum('expenses', 'amount')
+                    ->badge()
+                    ->colors([
+                        'warning' => fn($state) => $state == 0,
+                        'success' => fn($state) => ($state > 0 && $state <= 500),
+                        'info' => fn($state) => ($state > 500 && $state <= 2000),
+                        'grey' => fn($state) => ($state > 2000 && $state <= 5000),
+                        'danger' => fn($state) => $state > 5000
+                    ])
+                    ->sortable()
+                    ->toggleable(),
                 TextColumn::make('created_at')->dateTime('d M Y h:ia')->label('Created')->sortable(),
             ])
             ->defaultSort('name', 'ASC')
