@@ -19,16 +19,15 @@ class EditExpense extends EditRecord
         ];
     }
 
-    protected function afterSave(): void
+    protected function getSavedNotification(): ?Notification
     {
-        Notification::make()
+        return Notification::make()
+            ->success()
             ->title('Expense Updated !')
             ->body('Your expense has been updated.')
             ->icon('heroicon-o-check-circle')
             ->iconColor('success')
-            ->success()
-            ->duration(3000) // 3 seconds
-            ->send();
+            ->duration(3000); // 3 seconds
     }
 
     protected function getRedirectUrl(): string

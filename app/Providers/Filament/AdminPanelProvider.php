@@ -2,6 +2,9 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Widgets\ExpensesBarChart;
+use App\Filament\Widgets\ExpensesLineChart;
+use App\Filament\Widgets\ExpensesPieChart;
 use Filament\Pages\Dashboard;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
@@ -50,11 +53,38 @@ class AdminPanelProvider extends PanelProvider
             ->pages([
                 Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
+            // ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                AccountWidget::class,
-                FilamentInfoWidget::class,
+                // AccountWidget::class,
+                // FilamentInfoWidget::class,
+                ExpensesLineChart::class,
+                ExpensesPieChart::class,
+                ExpensesBarChart::class,
             ])
+
+            // Add manifest in <head>
+            ->renderHook(
+                'panels::head.end',
+                fn(): string => <<<'HTML'
+                    <link rel="manifest" href="/manifest.json">
+                    <meta name="theme-color" content="#0f172a">
+                HTML,
+            )
+
+            // Add service worker registration before </body>
+            ->renderHook(
+                'panels::body.end',
+                fn(): string => <<<'HTML'
+                    <script>
+                        if ("serviceWorker" in navigator) {
+                            navigator.serviceWorker.register("/sw.js")
+                                .then(reg => console.log("Service worker registered", reg))
+                                .catch(err => console.error("SW registration failed:", err));
+                        }
+                    </script>
+                HTML,
+            )
+
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -70,4 +100,20 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ]);
     }
+
+    // protected function getHeaderWidgets(): array
+    // {
+    //     return [
+    //         ExpensesLineChart::class,
+    //         ExpensesBarChart::class,
+    //     ];
+    // }
+
+    // // TODO :: footer widget
+    // protected function getFooterWidgets(): array
+    // {
+    //     return [
+    //         FilamentInfoWidget::class,
+    //     ];
+    // }
 }
